@@ -6,11 +6,24 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>TODO supply a title</title>
+        <title>Blog WS</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <div>TODO write content</div>
+        <form method="post" enctype="application/x-www-form-urlencoded" action="resources/articles">  
+            <p>  
+                <label for="titre">Titre</label>  
+                <input type="text" name="titre"/>  
+            </p>  
+            <p>  
+                <label for="content">Texte</label>  
+                <textarea id="content" name="contenu"></textarea>  
+            </p>  
+
+            <p>  
+                <input name="soumettre" type="submit">  
+            </p>  
+        </form> 
     </body>
 </html>

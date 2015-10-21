@@ -6,18 +6,28 @@
 package service;
 
 import entities.Article;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 /**
  *
@@ -26,12 +36,16 @@ import javax.ws.rs.Produces;
 @Stateless
 @Path("entities.article")
 public class ArticleFacadeREST extends AbstractFacade<Article> {
+
     @PersistenceContext(unitName = "BlogPU")
     private EntityManager em;
 
     public ArticleFacadeREST() {
         super(Article.class);
     }
+
+    @Context
+    UriInfo uriInfo;
 
     @POST
     @Override
@@ -85,5 +99,26 @@ public class ArticleFacadeREST extends AbstractFacade<Article> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
+    @POST
+    @Consumes({MediaType.APPLICATION_FORM_URLENCODED})
+    public Response createFromFormulaire(@FormParam("titre") String titre,
+            @FormParam("contenu") String contenu) {
+        Article a = new Article(titre, contenu);
+        super.create(a);
+
+        // Create URI for Response    
+        UriBuilder b = uriInfo.getBaseUriBuilder();
+        URI u = null;
+        try {
+            u = new URI(b.path(ArticleFacadeREST.class).build() + "/" + a.getId());
+            System.out.println("Donnée créée avec comme URI : " + u);
+            System.out.println("Dans create titre: " + a.getTitre() + " content: " + a.getContenu());
+
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(ArticleFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return Response.created(u).build();
+    }
+
 }
